@@ -6,14 +6,21 @@ case class CaseClass(name: String, fields: Map[String, ScalaType]) extends Scala
 
 object CaseClass {
 
-  //TODO @tailrec
-  def getClasses(caseClass: CaseClass): Set[CaseClass] = {
-    val classes = caseClass.fields.collect {
-      case (name, cc: CaseClass) => cc
-      case (name, SeqType(cc: CaseClass))  => cc
-    }.toList
-    val c = classes.flatMap(getClasses)
-    (caseClass +: (classes ++ c)).toSet
+  def apply(caseClasses: Seq[CaseClass]): Set[CaseClass] = {
+    val allClasses = caseClasses.map(extract).reduce(_ ++ _)
+    allClasses.groupBy(_.name).mapValues(s => infer(s.head, s.tail: _*)).values.toSet
+  }
+
+  def extract(caseClass: CaseClass): List[CaseClass] = {
+    @tailrec
+    def loop(caseClasses: List[CaseClass], acc: List[CaseClass] = List[CaseClass]()): List[CaseClass] = {
+      val classes = caseClasses.flatMap(_.fields.collect {
+        case (name, cc: CaseClass) => cc
+        case (name, SeqType(cc: CaseClass)) => cc
+      }.toList)
+      if(classes.isEmpty) acc ++ caseClasses else loop(classes, acc ++ caseClasses)
+    }
+    loop(List(caseClass))
   }
 
   //TODO infer basic type

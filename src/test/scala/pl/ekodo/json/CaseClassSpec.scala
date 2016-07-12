@@ -37,14 +37,14 @@ class CaseClassSpec extends FlatSpec with Matchers {
 
   "CaseClass getClasses" should "return the same class if there is no nested class" in {
     val testClass = CaseClass("test", Map("a" -> StringType, "b" -> IntType))
-    CaseClass.getClasses(testClass) shouldEqual Set(testClass)
+    CaseClass.extract(testClass) should contain theSameElementsAs Seq(testClass)
   }
 
   it should "return all nested classes (one level)" in {
     val nestedClassB = CaseClass("b", Map("b" -> StringType))
     val nestedClassC = CaseClass("c", Map("c" -> StringType))
     val testClass = CaseClass("test", Map("a" -> StringType, "b" -> nestedClassB, "c" -> nestedClassC))
-    CaseClass.getClasses(testClass) shouldEqual Set(testClass, nestedClassB, nestedClassC)
+    CaseClass.extract(testClass) should contain theSameElementsAs Seq(testClass, nestedClassB, nestedClassC)
   }
 
   it should "return all nested classes (two levels)" in {
@@ -52,7 +52,7 @@ class CaseClassSpec extends FlatSpec with Matchers {
     val nestedClassC = CaseClass("c", Map("c" -> StringType))
     val nestedClassD = CaseClass("d", Map("d" -> nestedClassC))
     val testClass = CaseClass("test", Map("a" -> StringType, "b" -> nestedClassB, "d" -> nestedClassD))
-    CaseClass.getClasses(testClass) shouldEqual Set(testClass, nestedClassB, nestedClassC, nestedClassD)
+    CaseClass.extract(testClass) should contain theSameElementsAs Seq(testClass, nestedClassB, nestedClassC, nestedClassD)
   }
 
 
