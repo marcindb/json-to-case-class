@@ -4,7 +4,10 @@ import spray.json._
 
 object JsonToScala {
 
-  def apply(rootClass: String, obj: JsObject): CaseClass = toCaseClass(rootClass, obj)
+  def apply(rootClass: String, json: String): CaseClass = {
+    val obj = json.parseJson.asJsObject
+    toCaseClass(rootClass, obj)
+  }
 
   private def toScalaType(name: String, jsValue: JsValue): ScalaType = jsValue match {
     case obj: JsObject => toCaseClass(name, obj)
@@ -13,8 +16,8 @@ object JsonToScala {
   }
 
   private def toCaseClass(name: String, jsObject: JsObject): CaseClass = {
-    val fields = jsObject.fields.mapValues {
-      toScalaType(name, _)
+    val fields = jsObject.fields.map {
+      case(k,v) => k -> toScalaType(k, v)
     }
     CaseClass(name.capitalize, fields)
   }

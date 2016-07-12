@@ -7,4 +7,6 @@ scalaVersion := "2.11.8"
 libraryDependencies += "io.spray" %% "spray-json" % "1.3.2"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+
+libraryDependencies += "com.github.scopt" %% "scopt" % "3.5.0"
     
