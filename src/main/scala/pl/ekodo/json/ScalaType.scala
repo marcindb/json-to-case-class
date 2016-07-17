@@ -34,8 +34,7 @@ object ScalaTypesHierarchy {
     IntType -> Some(LongType)
   ).withDefaultValue(Some(AnyType))
 
-  def commonParent(type1: ScalaType, type2: ScalaType): ScalaType = h(type1).intersect(h(type2)).head
-
+  def commonParent(types: List[ScalaType]): ScalaType = types.map(h).reduce((t1, t2) => t1.intersect(t2)).head
 
   def h(t: ScalaType): List[ScalaType] = {
     @tailrec
