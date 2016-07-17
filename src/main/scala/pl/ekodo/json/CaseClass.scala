@@ -23,7 +23,6 @@ object CaseClass {
     loop(List(caseClass))
   }
 
-  //TODO infer basic type
   def infer(caseClass: CaseClass, caseClasses: CaseClass*): CaseClass = {
     val name = caseClass.name
     require(caseClasses.forall(_.name == name), "All classes must have the same name.")
@@ -31,8 +30,11 @@ object CaseClass {
     val size = allClasses.size
     val fields = allClasses
       .foldLeft(List[(String, ScalaType)]())((acc, cc) => acc ++ cc.fields.toList)
-      .groupBy(identity)
-      .mapValues(_.size)
+      .groupBy(_._1)
+      .map{ case (k,v) =>
+        val inferredType = ScalaTypesHierarchy.commonParent(v.map(_._2))
+        (k, inferredType) -> v.size
+      }
 
     val inferredFields = fields.collect {
       case (key, count) if count == size => key
