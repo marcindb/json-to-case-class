@@ -32,9 +32,15 @@ object JsonToScala {
   private def toBasicType(jsValue: JsValue): ScalaType = jsValue match {
     case JsNull => AnyType
     case JsTrue | JsFalse => BooleanType
-    case JsNumber(x) => BigDecimalType
-    case JsString(x) => StringType
+    case JsNumber(v) => toNumberType(v)
+    case _: JsString => StringType
     case _ => throw new IllegalStateException
   }
+
+  private def toNumberType(v: BigDecimal): ScalaType =
+    if(v.scale > 0) DoubleType
+    else if(v.isValidInt) IntType
+    else if(v.isValidLong) LongType
+    else BigDecimalType
 
 }

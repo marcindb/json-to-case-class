@@ -26,7 +26,7 @@ class JsonToScalaSpec extends FlatSpec with Matchers with JsonToScalaFixtures {
   it should "parse json with nested object" in {
     val result = JsonToScala("A", json4)
     result.name shouldEqual "A"
-    result.fields("c") shouldBe CaseClass("C", Map("c" -> BigDecimalType))
+    result.fields("c") shouldBe CaseClass("C", Map("c" -> IntType))
   }
 
 }
