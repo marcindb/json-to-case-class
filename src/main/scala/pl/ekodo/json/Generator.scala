@@ -31,10 +31,10 @@ object Generator extends App {
         .map(line => JsonToScala(config.rootClass, line))
         .toSeq
       val caseClasses = CaseClass(parsed)
-      println(caseClasses)
+      FilesGenerator(config.out.toPath, caseClasses)
 
     case None =>
-     sys.exit(0)
+      sys.exit(0)
   }
 
 
