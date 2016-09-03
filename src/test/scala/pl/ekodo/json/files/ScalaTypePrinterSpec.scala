@@ -1,6 +1,7 @@
-package pl.ekodo.json
+package pl.ekodo.json.files
 
 import org.scalatest.{FlatSpec, Matchers}
+import pl.ekodo.json.model.{CaseClass, IntType, StringType}
 
 class ScalaTypePrinterSpec extends FlatSpec with Matchers {
 

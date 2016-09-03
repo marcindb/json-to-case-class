@@ -1,4 +1,4 @@
-package pl.ekodo.json
+package pl.ekodo.json.model
 
 import org.scalatest.{FlatSpec, Matchers}
 

@@ -1,7 +1,18 @@
-package pl.ekodo.json
+package pl.ekodo.json.files
 
+import pl.ekodo.json.model._
+
+/**
+  * Converts CaseClass to string representation
+  */
 object ScalaTypePrinter {
 
+  /**
+    * Converts CaseClass to string representation
+    *
+    * @param cc  given case class
+    * @return    string with case class representation
+    */
   def apply(cc: CaseClass): String = {
     val sb = new StringBuilder
     sb.append(s"case class ${cc.name}(\n")

@@ -1,12 +1,23 @@
-package pl.ekodo.json
+package pl.ekodo.json.files
 
 import java.io.IOException
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 
+import pl.ekodo.json.model.CaseClass
+
+/**
+  * Generates files with case classes
+  */
 object FilesGenerator {
 
-  def apply(outputDir: Path, classes: Set[CaseClass]) {
+  /**
+    * Generates files with case classes
+    *
+    * @param outputDir  output dir for generated classes
+    * @param classes    classes which have to be generated
+    */
+  def apply(outputDir: Path, classes: Iterable[CaseClass]): Unit = {
     val dir = prepareOutputFolder(outputDir)
     classes.foreach { cc =>
       val s = ScalaTypePrinter(cc)
@@ -30,6 +41,5 @@ object FilesGenerator {
     }
     Files.createDirectory(output)
   }
-
 
 }

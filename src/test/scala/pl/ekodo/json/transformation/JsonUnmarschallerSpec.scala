@@ -1,37 +1,38 @@
-package pl.ekodo.json
+package pl.ekodo.json.transformation
 
 import org.scalatest.{FlatSpec, Matchers}
+import pl.ekodo.json.model.{CaseClass, IntType, StringType}
 
-class JsonToScalaSpec extends FlatSpec with Matchers with JsonToScalaFixtures {
+class JsonUnmarschallerSpec extends FlatSpec with Matchers with JsonUnmarschallerFixtures {
 
   "JsonToScala" should "parse empty json object" in {
-    val result = JsonToScala("Empty", json1)
+    val result = JsonUnmarschaller("Empty", json1)
     result.name shouldEqual "Empty"
     result.fields shouldBe empty
   }
 
   it should "parse json with one field" in {
-    val result = JsonToScala("A", json2)
+    val result = JsonUnmarschaller("A", json2)
     result.name shouldEqual "A"
     result.fields("a") shouldBe StringType
   }
 
   it should "parse json with two fields" in {
-    val result = JsonToScala("A", json3)
+    val result = JsonUnmarschaller("A", json3)
     result.name shouldEqual "A"
     result.fields("a") shouldBe StringType
     result.fields("b") shouldBe StringType
   }
 
   it should "parse json with nested object" in {
-    val result = JsonToScala("A", json4)
+    val result = JsonUnmarschaller("A", json4)
     result.name shouldEqual "A"
-    result.fields("c") shouldBe CaseClass("C", Map("c" -> IntType))
+    result.fields("c") shouldBe CaseClass("C", Map("c" -> IntType), List("A"))
   }
 
 }
 
-trait JsonToScalaFixtures {
+trait JsonUnmarschallerFixtures {
 
   val json1 =
     """

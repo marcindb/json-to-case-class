@@ -1,27 +1,10 @@
-package pl.ekodo.json
+package pl.ekodo.json.model
 
 import scala.annotation.tailrec
 
-trait ScalaType
-
-case object AnyType extends ScalaType
-
-case class SeqType(scalaType: ScalaType) extends ScalaType
-
-case object StringType extends ScalaType
-
-case object IntType extends ScalaType
-
-case object LongType extends ScalaType
-
-case object DoubleType extends ScalaType
-
-case object BigDecimalType extends ScalaType
-
-case object BooleanType extends ScalaType
-
-case class OptionalType(scalaType: ScalaType) extends ScalaType
-
+/**
+  * Simple representation of types hierarchy
+  */
 object ScalaTypesHierarchy {
 
   private val hierarchy = Map[ScalaType, Option[ScalaType]](
@@ -34,9 +17,19 @@ object ScalaTypesHierarchy {
     IntType -> Some(LongType)
   ).withDefaultValue(Some(AnyType))
 
-  def commonParent(types: List[ScalaType]): ScalaType = types.map(h).reduce((t1, t2) => t1.intersect(t2)).head
+  /**
+    * Infers minimal common parent for given scala types
+    *
+    * @param types  scala types
+    * @return       minimal parent for given types
+    */
+  def commonParent(types: List[ScalaType]): ScalaType =
+    types.
+      map(parents).
+      reduce((t1, t2) => t1.intersect(t2)).
+      head
 
-  def h(t: ScalaType): List[ScalaType] = {
+  private def parents(t: ScalaType): List[ScalaType] = {
     @tailrec
     def loop(t: ScalaType, acc: List[ScalaType]): List[ScalaType] = {
       val parentType = hierarchy(t)
@@ -49,5 +42,3 @@ object ScalaTypesHierarchy {
   }
 
 }
-
-

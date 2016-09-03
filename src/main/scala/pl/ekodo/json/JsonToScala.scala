@@ -1,46 +1,48 @@
 package pl.ekodo.json
 
-import spray.json._
+import java.io.File
 
-object JsonToScala {
+import pl.ekodo.json.files.FilesGenerator
+import pl.ekodo.json.transformation.{ClassExtractor, ClassMerger, JsonUnmarschaller}
 
-  def apply(rootClass: String, json: String): CaseClass = {
-    val obj = json.parseJson.asJsObject
-    toCaseClass(rootClass, obj)
+import scala.io.Source
+
+object JsonToScala extends App {
+
+  val parser = new scopt.OptionParser[Config]("scopt") {
+    head("JSON to Scala case classes")
+
+    opt[String]('r', "root").action((x, c) =>
+      c.copy(rootClass = x)).text("name of root class")
+
+    opt[File]('i', "in").required().valueName("<file>").
+      action((x, c) => c.copy(in = x)).
+      text("in file with json requests")
+
+    opt[File]('o', "out").valueName("<dir>").
+      action((x, c) => c.copy(out = x)).
+      text("out folder")
+
   }
 
-  private def toScalaType(name: String, jsValue: JsValue): ScalaType = jsValue match {
-    case obj: JsObject => toCaseClass(name, obj)
-    case arr: JsArray => toSeq(name, arr)
-    case value: JsValue => toBasicType(value)
+  parser.parse(args, Config()) match {
+
+    case Some(config) =>
+      val parsed = Source.
+        fromFile(config.in).
+        getLines.
+        map(line => JsonUnmarschaller(config.rootClass, line)).
+        toStream
+
+      val caseClasses = ClassExtractor(parsed)
+      val merged = ClassMerger(caseClasses)
+      FilesGenerator(config.out.toPath, merged)
+
+
+    case None =>
+      sys.exit(0)
   }
-
-  private def toCaseClass(name: String, jsObject: JsObject): CaseClass = {
-    val fields = jsObject.fields.map {
-      case(k,v) => k -> toScalaType(k, v)
-    }
-    CaseClass(name.capitalize, fields)
-  }
-
-  private def toSeq(name: String, jsArray: JsArray) = {
-    val elems = jsArray.elements.map(toScalaType(name, _))
-
-    SeqType(elems.head)
-  }
-
-
-  private def toBasicType(jsValue: JsValue): ScalaType = jsValue match {
-    case JsNull => AnyType
-    case JsTrue | JsFalse => BooleanType
-    case JsNumber(v) => toNumberType(v)
-    case _: JsString => StringType
-    case _ => throw new IllegalStateException
-  }
-
-  private def toNumberType(v: BigDecimal): ScalaType =
-    if(v.scale > 0) DoubleType
-    else if(v.isValidInt) IntType
-    else if(v.isValidLong) LongType
-    else BigDecimalType
 
 }
+
+case class Config(rootClass: String = "Root", in: File = new File("."), out: File = new File("./generated"))
