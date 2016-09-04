@@ -2,6 +2,8 @@ package pl.ekodo.json.files
 
 import pl.ekodo.json.model._
 
+import scala.collection.immutable.ListMap
+
 /**
   * Converts CaseClass to string representation
   */
@@ -16,7 +18,7 @@ object ScalaTypePrinter {
   def apply(cc: CaseClass): String = {
     val sb = new StringBuilder
     sb.append(s"case class ${cc.name}(\n")
-    val fields = cc.fields.map { case (k, v) => s"  $k: ${print(v)}" }.mkString(",\n")
+    val fields = ListMap(cc.fields.toSeq.sortBy(_._1): _*).map { case (k, v) => s"  $k: ${print(v)}" }.mkString(",\n")
     sb.append(fields)
     sb.append("\n)\n")
     sb.toString()
