@@ -28,4 +28,18 @@ class ScalaTypePrinterSpec extends FlatSpec with Matchers {
     ScalaTypePrinter(classA).trim shouldEqual classAString.trim
   }
 
+  it should "return string with class representation with fields in alphabetical order" in {
+    val classA = CaseClass("Test", Map("d" -> StringType, "c" -> IntType, "a" -> StringType, "b" -> IntType))
+    val classAString =
+      """
+        |case class Test(
+        |  a: String,
+        |  b: Int,
+        |  c: Int,
+        |  d: String
+        |)
+      """.stripMargin
+    ScalaTypePrinter(classA).trim shouldEqual classAString.trim
+  }
+
 }
