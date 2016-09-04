@@ -9,7 +9,7 @@ case class CaseClass(
   name: String,
   fields: Map[String, ScalaType],
   parents: List[String] = List.empty,
-  replace: List[CaseClass] = List.empty) extends ScalaType
+  replace: Set[CaseClass] = Set.empty) extends ScalaType
 
 case object AnyType extends ScalaType
 
