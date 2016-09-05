@@ -3,11 +3,12 @@ package pl.ekodo.json
 import java.io.File
 
 import pl.ekodo.json.files.FilesGenerator
+import pl.ekodo.json.model.CaseClass
 import pl.ekodo.json.transformation.{ClassExtractor, ClassMerger, JsonUnmarschaller}
 
 import scala.io.Source
 
-object JsonToScala extends App {
+object JsonToScala {
 
   val parser = new scopt.OptionParser[Config]("scopt") {
     head("JSON to Scala case classes")
@@ -22,25 +23,23 @@ object JsonToScala extends App {
     opt[File]('o', "out").valueName("<dir>").
       action((x, c) => c.copy(out = x)).
       text("out folder")
-
   }
 
-  parser.parse(args, Config()) match {
+  def main(args: Array[String]) =  {
+    parser.parse(args, Config()) match {
+      case Some(config) =>
+        val merged = convert(Source.fromFile(config.in).getLines.toStream, config.rootClass)
+        FilesGenerator(config.out.toPath, merged)
 
-    case Some(config) =>
-      val parsed = Source.
-        fromFile(config.in).
-        getLines.
-        map(line => JsonUnmarschaller(config.rootClass, line)).
-        toStream
+      case None =>
+        sys.exit(0)
+    }
+  }
 
-      val caseClasses = ClassExtractor(parsed)
-      val merged = ClassMerger(caseClasses)
-      FilesGenerator(config.out.toPath, merged)
-
-
-    case None =>
-      sys.exit(0)
+  def convert(jsonLines: Iterable[String], rootClassName: String): Iterable[CaseClass] = {
+    val parsed = jsonLines.map(line => JsonUnmarschaller(rootClassName, line)).toStream
+    val caseClasses = ClassExtractor(parsed)
+    ClassMerger(caseClasses)
   }
 
 }

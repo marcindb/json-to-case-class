@@ -1,7 +1,7 @@
 package pl.ekodo.json.transformation
 
 import org.scalatest.{FlatSpec, Matchers}
-import pl.ekodo.json.model.{CaseClass, IntType, StringType}
+import pl.ekodo.json.model._
 
 class JsonUnmarschallerSpec extends FlatSpec with Matchers with JsonUnmarschallerFixtures {
 
@@ -28,6 +28,13 @@ class JsonUnmarschallerSpec extends FlatSpec with Matchers with JsonUnmarschalle
     val result = JsonUnmarschaller("A", json4)
     result.name shouldEqual "A"
     result.fields("c") shouldBe CaseClass("C", Map("c" -> IntType), List("A"))
+  }
+
+  it should "parse json with empty array" in {
+    val result = JsonUnmarschaller("A", json5)
+    result.name shouldEqual "A"
+    result.fields("a") shouldBe StringType
+    result.fields("b") shouldBe SeqType(AnyType)
   }
 
 }
@@ -62,6 +69,14 @@ trait JsonUnmarschallerFixtures {
       |"c" : {
       |  "c" : 1
       |}
+      |}
+    """.stripMargin
+
+  val json5 =
+    """
+      |{
+      |"a" : "a",
+      |"b" : []
       |}
     """.stripMargin
 }
